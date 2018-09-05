@@ -123,18 +123,24 @@ function hiddenaddresses_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) 
   _hiddenaddresses_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-
 /**
- * Implements hook_civicrm_coreResourceList().
+ * Implements hook_civicrm_buildForm().
  */
-function hiddenaddresses_civicrm_coreResourceList(&$items, $region) {
-  if ($region == 'html-header') {
+function hiddenaddresses_civicrm_pageRun(&$page) {
+  $pageName = $page->getVar('_name');
+  if ($pageName == 'CRM_Contact_Page_View_Summary') {
     CRM_Core_Resources::singleton()->addScriptFile('org.agbu.hiddenaddresses', 'js/hiddenaddresses.js', 1000, 'html-header');
   }
 }
 
-
-
+/**
+ * Remove the validation that prevents you saving multiple "Old" addresses.
+ */
+function hiddenaddresses_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+  if ($context == 'form' && $tplName == 'CRM/Contact/Form/Inline/Address.tpl') {
+    $content = str_replace("if (lt != '') {", "if (lt != '' && cj('option:selected', ele).text() != 'Old') {", $content);
+  }
+}
 
 // --- Functions below this ship commented out. Uncomment as required. ---
 
